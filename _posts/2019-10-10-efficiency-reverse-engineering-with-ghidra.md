@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Efficieny: Reverse Engineering with ghidra"
+title: "Efficiency: Reverse Engineering with ghidra"
 author: wapiflapi
 tags:
 - CTF
