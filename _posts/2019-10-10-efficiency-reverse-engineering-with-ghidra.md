@@ -43,7 +43,7 @@ would like to analyze the file right now when prompted.
 In the `Symbol Tree` we notice there are only a dozen functions we
 don't recognize so let's start looking at what they do.
 
-```C
+```c
 void FUN_00101020(void) {
   // WARNING: Treating indirect jump as call
   (*(code *)(undefined *)0x0)();
@@ -69,7 +69,7 @@ interpreters we are used to seeing in CTFs. Let's rename all those
 functions to what we assume they'll be doing:
 
 
-```C
+```c
 void FUN_00101155(undefined4 *puParm1, undefined4 *puParm2) {
   *puParm1 = *puParm2;
   return;
@@ -87,7 +87,7 @@ know that they take `(int *, int *)` (for most of them.)
 
 If we do the same for all the little functions we end up with:
 
-```C
+```c
 void do_mov_aX_bX(undefined4 *puParm1, undefined4 *puParm2) {
   *puParm1 = *puParm2;
 }
@@ -125,7 +125,7 @@ and write to some global `DAT_something` variables. Let's just
 continue with our naming scheme until we find anything better to do:
 
 
-```C
+```c
 void do_mov_DAT_0010506c_aX(undefined4 *puParm1) {
   DAT_0010506c = *puParm1;
 }
@@ -144,7 +144,7 @@ Our suspicions are confirmed by the following three functions which
 look an awful lot like (unconditional) `jmp`, `jnz` (jmp if non zero)
 and `jz` (jmp if zero).
 
-```C
+```c
 
 void do_jmp_a(undefined4 uParm1) {
   DAT_00105064 = uParm1;
@@ -180,7 +180,7 @@ functions in order, we're almost done anyway.
 The next function is somewhat more complicated than the small
 operations we've been seeing so far.
 
-```C
+```c
 void FUN_001012c6(int *piParm1,int *piParm2) {
   long local_20;
   ulong local_18;
@@ -230,7 +230,7 @@ at. In most cases we probably don't care about that for understanding
 the code so let's simplify for readability:
 
 
-```C
+```c
 void FUN_001012c6(int *piParm1,int *piParm2) {
   long local_20;
   ulong bit_vector;
@@ -307,7 +307,7 @@ the first one.
 
 ### On to main.
 
-```C
+```c
 
 undefined8 FUN_001017e4(void) {
   // ...
@@ -324,7 +324,7 @@ it is that's going to call all of the functions read before.
 
 Let's focus on the big mess first:
 
-```C
+```c
  do {
   a = local_data[(long)(DATA_IP + 1)];
   b = local_data[(long)(DATA_IP + 2)];
@@ -442,7 +442,7 @@ and we can set the prototype we wish for all those functions.
 **With those two things everything looks much cleaner:**
 
 
-```C
+```c
 do {
     param_a = local_data[(DATA_IP + 1)];
     param_b = local_data[(DATA_IP + 2)];
@@ -528,7 +528,7 @@ At this point we could either attach gdb and set a breakpoint when we know
 Or read the RRTFM (read rest of fucking main) and learn that it's being
 loaded from global memory, relevant code;
 
-```C
+```c
   puVar4 = &DAT_00102020;
   puVar5 = local_data;
   while (lVar3 != 0) {
