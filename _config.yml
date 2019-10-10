@@ -30,6 +30,8 @@ github_username:  wapiflapi
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-gist
+  - jekyll-paginate
 
 remote_theme: jljouannic/hydeout
 paginate: 50
