@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: '@wapiflapi'
+title: wapiflapi
 email: wapiflapi@gmail.com
 description: "Binary analysis, computer security, exploit writing, CTFs, hacking."
 baseurl: "" # the subpath of your site, e.g. /blog
@@ -35,6 +35,10 @@ plugins:
 
 remote_theme: jljouannic/hydeout
 paginate: 50
+
+author:
+  name:           'Wannes Rombouts'
+  url:            https://twitter.com/wapiflapi
 
 # Exclude from processing.
 # The following items will not be processed, by default.
