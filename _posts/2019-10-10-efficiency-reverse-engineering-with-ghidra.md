@@ -43,11 +43,9 @@ would like to analyze the file right now when prompted.
 In the `Symbol Tree` we notice there are only a dozen functions we
 don't recognize so let's start looking at what they do.
 
-``` C
-void FUN_00101020(void)
-
-{
-                    // WARNING: Treating indirect jump as call
+```C
+void FUN_00101020(void) {
+  // WARNING: Treating indirect jump as call
   (*(code *)(undefined *)0x0)();
   return;
 }
@@ -65,16 +63,14 @@ this for now, probably not important.
 previous one, but then we have a whole lot of very small functions
 that seem to actually do stuff.
 
-We notice that all (most) of them take two parameters and do a very
-simple operations. This looks a lot like the naive implementation of
-byte-code interpreters we are used to seeing in CTFs. Let's rename all
-those functions to what we assume they'll be doing:
+**Most of them take two arguments and do a very simple operations.**
+This looks a lot like the naive implementation of byte-code
+interpreters we are used to seeing in CTFs. Let's rename all those
+functions to what we assume they'll be doing:
 
 
-``` C
-void FUN_00101155(undefined4 *puParm1,undefined4 *puParm2)
-
-{
+```C
+void FUN_00101155(undefined4 *puParm1, undefined4 *puParm2) {
   *puParm1 = *puParm2;
   return;
 }
@@ -85,52 +81,56 @@ rename it to `do_mov_aX_bX`. I like being explicit about the number of
 arguments they take (following "destination before source" convention)
 and about whether they deference them or not. The `X` indicates those
 arguments are dereferenced which would be obvious for the destination
-(a) but not so much for the source (b).
+(a) but not so much for the source (b). At this point you could also
+take the time to update the function prototypes in Ghidra, letting it
+know that they take `(int *, int *)` (for most of them.)
 
 If we do the same for all the little functions we end up with:
 
-``` C
-void do_mov_aX_bX(undefined4 *puParm1,undefined4 *puParm2) {
+```C
+void do_mov_aX_bX(undefined4 *puParm1, undefined4 *puParm2) {
   *puParm1 = *puParm2;
 }
 
-void do_mov_aX_b(undefined4 *puParm1,undefined4 uParm2) {
+void do_mov_aX_b(undefined4 *puParm1, undefined4 uParm2) {
   *puParm1 = uParm2;
 }
 
-void do_xor_aX_bX(uint *puParm1,uint *puParm2) {
+void do_xor_aX_bX(uint *puParm1, uint *puParm2) {
   *puParm1 = *puParm1 ^ *puParm2;
 }
 
-void do_add_aX_bX(int *piParm1,int *piParm2) {
+void do_add_aX_bX(int *piParm1, int *piParm2) {
   *piParm1 = *piParm1 + *piParm2;
 }
 
-void do_sub_aX_bX(int *piParm1,int *piParm2) {
+void do_sub_aX_bX(int *piParm1, int *piParm2) {
   *piParm1 = *piParm1 - *piParm2;
 }
 
-void do_rol_aX_bX(int *piParm1,undefined8 uParm2) {
+void do_rol_aX_bX(int *piParm1, undefined8 uParm2) {
   *piParm1 = *piParm1 << ((byte)uParm2 & 0x1f);
 }
 
-void do_ror_aX_bX(int *piParm1,undefined8 uParm2) {
+void do_ror_aX_bX(int *piParm1, undefined8 uParm2) {
   *piParm1 = *piParm1 >> ((byte)uParm2 & 0x1f);
 }
 ```
 
+### Dealing with global variables
+
 The functions above all follow the exact same pattern so it's easy to
 name them. We also encounter some of those small functions that read
-and write to some global `DAT_something` variables. But let's just
-continue with our naming scheme for now:
+and write to some global `DAT_something` variables. Let's just
+continue with our naming scheme until we find anything better to do:
 
 
-``` C
+```C
 void do_mov_DAT_0010506c_aX(undefined4 *puParm1) {
   DAT_0010506c = *puParm1;
 }
 
-void do_mov_DAT_00105068_cmp_aX_bX(int *piParm1,int *piParm2) {
+void do_mov_DAT_00105068_cmp_aX_bX(int *piParm1, int *piParm2) {
   DAT_00105068 = *piParm1 != *piParm2;
 }
 ```
@@ -144,7 +144,7 @@ Our suspicions are confirmed by the following three functions which
 look an awful lot like (unconditional) `jmp`, `jnz` (jmp if non zero)
 and `jz` (jmp if zero).
 
-``` C
+```C
 
 void do_jmp_a(undefined4 uParm1) {
   DAT_00105064 = uParm1;
@@ -164,12 +164,10 @@ void do_jz_a(undefined4 uParm1) {
 
 ```
 
-That means we are now presuming the following:
+**We are now presuming the following:**
   - `DAT_00105068` is actually a global `SHOULDJMP` flag.
-  - `DAT_00105064` is what is modified by the jump, so it's reasonable
-     to assume it holds the current instruction pointer. Renamed to
-     `DATA_IP`
-
+  - `DAT_00105064` is what is modified by the jump, it's reasonable
+     to assume it is the current instruction pointer `DATA_IP`.
 
 We still haven't seen anything resembling the main function, or
 whatever it is that is prompting us for a password when running the
@@ -182,7 +180,7 @@ functions in order, we're almost done anyway.
 The next function is somewhat more complicated than the small
 operations we've been seeing so far.
 
-``` C
+```C
 void FUN_001012c6(int *piParm1,int *piParm2) {
   long local_20;
   ulong local_18;
@@ -205,8 +203,8 @@ void FUN_001012c6(int *piParm1,int *piParm2) {
 ```
 
 `SEXT48`, `SUB168` and `ZEXT816` are not standard C and might look
-weird, ghidra's built-in help is really good and deserves to be used a
-lot.
+weird, **ghidra's built-in help is really good and deserves to be used a
+lot.**
 
 In the Decompiler section we find that:
 
@@ -216,7 +214,7 @@ In the Decompiler section we find that:
 > The x is the thing being truncated
 > The c is the number of least significant bytes being truncated
 >
-> EXT14(x) - zero extension
+> **EXT14(x) - zero extension**
 > The 1 is the size of the operand x
 > The 4 is the size of the output in bytes
 > This is almost always a cast from small integer types to big unsigned types.
@@ -226,13 +224,13 @@ In the Decompiler section we find that:
 > The 4 is the size of the output in bytes
 > This is probably a cast from a small signed integer into a big signed integer.
 
-So basically all those mean is that the compiler had to juggle between
-4 byte, 8 byte and 16 byte operands for the code we're looking at. In
-most cases we probably don't care about that for understanding the
-code so let's simplify for readability:
+All this is simply an indication that the compiler had to juggle
+between 4 byte, 8 byte and 16 byte operands for the code we're looking
+at. In most cases we probably don't care about that for understanding
+the code so let's simplify for readability:
 
 
-``` C
+```C
 void FUN_001012c6(int *piParm1,int *piParm2) {
   long local_20;
   ulong bit_vector;
@@ -252,33 +250,31 @@ void FUN_001012c6(int *piParm1,int *piParm2) {
 }
 ```
 
-Notice that we're looping over all the bits in `local_18` (renamed to
-`bit_vector`) and computing `local_10` (renamed to `result`) which
-gets assigned to `*piParm1` as usual with all the operations we've
-seen so far. `*piParm2` seems to be some sort of modulus as it's only
-used for that.
+Notice that we're looping over all the bits in`bit_vector` (originally
+`local_18`) and computing `local_10` (renamed to `result`) which gets
+assigned to `*piParm1` as usual with all the operations we've seen so
+far. `*piParm2` seems to be some sort of modulus as it's only used for
+that.
 
-According to ghidra DAT_00104074 is `00010001h` and there are no other
-direct references to it (apart from the function we're looking at) so
-for now let's assume that's a constant.
+According to ghidra `DAT_00104074` is `0x10001` and there are no other
+direct references to it (apart from the function we're looking at) that
+could modify it so for now let's assume that's a constant.
 
-Rewriting this function in python, unrolling the loop since we know
-it's `0x10001`:
+Rewriting this function in python and unrolling the loop:
 
-
-``` python
+```python
 def do_something(a, b):
     result = 1
 
-    # first bit is a 1
+    # first bit is always 1
     result = (result * a) % b
     a = (a * a) % b
 
-    # then we have 15 bits that are 0
+    # then we always have 15 bits that are 0
     # a = (a * a) % b  # 15 times, which is a ** 2 ** 15
     a = (a ** 2 ** 15) % b
 
-    # last bit is a 1 again
+    # last bit is always a 1 again
     result = (result * a) % b
     a = (a * a) % b  # Notice this line does not affect the result.
 
@@ -287,7 +283,7 @@ def do_something(a, b):
 
 Simplifying the above _again_ we get:
 
-``` python
+```python
 def do_something(a, b):
     result = a % b
     # Now a changes:
@@ -300,10 +296,9 @@ Finally we end up with `return (a * a ** 2 ** 16) % b`
   - which is `return (a ** (2 ** 16 + 1)) % b`
   - which is `return (a ** 0x10001) % b`
 
-So this function is basically just a `do_aX_pow_0x10001_mod_bX`
-operation, if you couldn't tell because of my way of solving maths
-above, I'm not really good at maths.
-
+So **this function is basically just a `do_aX_pow_0x10001_mod_bX`
+operation**, If you couldn't tell because of my way of solving maths
+above: I'm not really good at maths.
 
 And with that it looks like we're done with all the small-ish
 functions that take one or two parameters and store their result in
@@ -312,18 +307,16 @@ the first one.
 
 ### On to main.
 
-``` C
+```C
 
-undefined8 FUN_001017e4(void)
-
-{
+undefined8 FUN_001017e4(void) {
   // ...
   puts("Please enter the password: ");
   read(0,&local_28,0x14);
   FUN_0010138b(&local_28);
 }
 ```
-Seems like we need to look at `FUN_0010138b` next, it takes our password as input.
+Seems like we need to look at `FUN_0010138b` next: it takes our password as input.
 
 It's a big function! It has two `while` loops followed by a `do { }
 while` with lots of `if`/`else` inside.  Looks like we found whatever
@@ -331,114 +324,114 @@ it is that's going to call all of the functions read before.
 
 Let's focus on the big mess first:
 
-``` C
-  do {
-    a = local_data[(long)(DATA_IP + 1)];
-    b = local_data[(long)(DATA_IP + 2)];
-    op = local_data[(long)DATA_IP];
-    if (op == 0x789abcde) {
-      do_cmp_ax_bx(&DAT_00104060 + (long)a,&DAT_00104060 + (long)(int)b,
-                   &DAT_00104060 + (long)(int)b);
+```C
+ do {
+  a = local_data[(long)(DATA_IP + 1)];
+  b = local_data[(long)(DATA_IP + 2)];
+  op = local_data[(long)DATA_IP];
+  if (op == 0x789abcde) {
+   do_cmp_ax_bx(&DAT_00104060 + (long)a,&DAT_00104060 + (long)(int)b,
+          &DAT_00104060 + (long)(int)b);
+  }
+  else {
+   if (op < 0x789abcdf) {
+    if (op == 0x6789abcd) {
+     do_jmp_a();
     }
     else {
-      if (op < 0x789abcdf) {
-        if (op == 0x6789abcd) {
-          do_jmp_a();
+     if (op < 0x6789abce) {
+      if (op == 0x56789abc) {
+       do_jz_a();
+      }
+      else {
+       if (op < 0x56789abd) {
+        if (op == 0x456789ab) {
+         do_add_aX_bX(&DAT_00104060 + (long)a,&DAT_00104060 + (long)(int)b,
+                &DAT_00104060 + (long)(int)b);
         }
         else {
-          if (op < 0x6789abce) {
-            if (op == 0x56789abc) {
-              do_jz_a();
+         if (op < 0x456789ac) {
+          if (op == 0x3456789a) {
+           do_xor_aX_bX(&DAT_00104060 + (long)a,&DAT_00104060 + (long)(int)b,
+                  &DAT_00104060 + (long)(int)b);
+          }
+          else {
+           if (op < 0x3456789b) {
+            if (op == 0x23456789) {
+             do_mov_aX_b(&DAT_00104060 + (long)a,(ulong)b);
             }
             else {
-              if (op < 0x56789abd) {
-                if (op == 0x456789ab) {
-                  do_add_aX_bX(&DAT_00104060 + (long)a,&DAT_00104060 + (long)(int)b,
-                               &DAT_00104060 + (long)(int)b);
+             if (op < 0x2345678a) {
+              if (op == 0x12345678) {
+               do_mov_aX_bX();
+              }
+              else {
+               if (op < 0x12345679) {
+                if (op == -0x10fedcbb) {
+                 do_sub_aX_bX();
                 }
                 else {
-                  if (op < 0x456789ac) {
-                    if (op == 0x3456789a) {
-                      do_xor_aX_bX(&DAT_00104060 + (long)a,&DAT_00104060 + (long)(int)b,
-                                   &DAT_00104060 + (long)(int)b);
+                 if (op < -0x10fedcba) {
+                  if (op == -0x210fedcc) {
+                   do_jnz_a();
+                  }
+                  else {
+                   if (op < -0x210fedcb) {
+                    if (op == -0x3210fedd) {
+                     do_aX_pow_0x10001_mod_bX();
                     }
                     else {
-                      if (op < 0x3456789b) {
-                        if (op == 0x23456789) {
-                          do_mov_aX_b(&DAT_00104060 + (long)a,(ulong)b);
-                        }
-                        else {
-                          if (op < 0x2345678a) {
-                            if (op == 0x12345678) {
-                              do_mov_aX_bX();
-                            }
-                            else {
-                              if (op < 0x12345679) {
-                                if (op == -0x10fedcbb) {
-                                  do_sub_aX_bX();
-                                }
-                                else {
-                                  if (op < -0x10fedcba) {
-                                    if (op == -0x210fedcc) {
-                                      do_jnz_a();
-                                    }
-                                    else {
-                                      if (op < -0x210fedcb) {
-                                        if (op == -0x3210fedd) {
-                                          do_aX_pow_0x10001_mod_bX();
-                                        }
-                                        else {
-                                          if (op < -0x3210fedc) {
-                                            if (op == -0x43210fee) {
-                                              do_mov_DAT_0010506c_aX();
-                                            }
-                                            else {
-                                              if (op < -0x43210fed) {
-                                                if (op == -0x543210ff) {
-                    // WARNING: Subroutine does not return
-                                                  exit(DAT_0010506c);
-                                                }
-                                                if (op < -0x543210fe) {
-                                                  if (op == -0x76543211) {
-                                                    do_rol_aX_b();
-                                                  }
-                                                  else {
-                                                    if (op == -0x65432110) {
-                                                      do_ror_aX_b();
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
+                     if (op < -0x3210fedc) {
+                      if (op == -0x43210fee) {
+                       do_mov_DAT_0010506c_aX();
                       }
+                      else {
+                       if (op < -0x43210fed) {
+                        if (op == -0x543210ff) {
+          // WARNING: Subroutine does not return
+                         exit(DAT_0010506c);
+                        }
+                        if (op < -0x543210fe) {
+                         if (op == -0x76543211) {
+                          do_rol_aX_b();
+                         }
+                         else {
+                          if (op == -0x65432110) {
+                           do_ror_aX_b();
+                          }
+                         }
+                        }
+                       }
+                      }
+                     }
                     }
+                   }
                   }
+                 }
                 }
+               }
               }
+             }
             }
+           }
           }
+         }
         }
+       }
       }
+     }
     }
-    DATA_IP += 3;
-  } while( true );
+   }
+  }
+  DATA_IP += 3;
+ } while( true );
 ```
 
-All the `<` comparisons are compilation artifacts, the original code
-probably had a `switch`/`case` and the compiler decided to implement
-some sort of binary balanced tree to reduce the number of comparisons
-needed for each `case`. We can safely remove them since the `==`
-comparisons are sufficient.
+**All the `<` comparisons are compilation artifacts**, the original
+code probably had a `switch`/`case` and the compiler decided to
+implement some sort of binary balanced tree to reduce the number of
+comparisons needed for each `case`. We can safely remove them since
+the `==` comparisons are sufficient.
 
 We also notice that some of the functions we know about (eg:
 `do_mov_aX_bX`) don't seem to take the right numbers of
@@ -446,10 +439,10 @@ arguments. It's hard for the decompiler to guess those in all
 circumstances but we can help! `right click > Edit Function Signature`
 and we can set the prototype we wish for all those functions.
 
-With those two things everything looks much cleaner:
+**With those two things everything looks much cleaner:**
 
 
-``` C
+```C
 do {
     param_a = local_data[(DATA_IP + 1)];
     param_b = local_data[(DATA_IP + 2)];
@@ -519,12 +512,12 @@ do {
 
 Much more readable already !
 
-A couple things we learned from this:
+**A couple things we learned from this:**
   - `DAT_0010506c` is the value with which the program will exit,
     which means that `do_mov_DAT_0010506c_aX` can be renamed to
-    `do_mov_DAT_EXIT_aX`.
-  - Looks like instructions are encoded on `3*4` bytes in `local_data`.
-  - We now have a map of an "instruction number" and what it does.
+    `do_mov_DAT_EXIT_aX` or `do_ldexit_aX`.
+  - We now have a mapping between "instruction numbers" and functionality.
+  - It looks like instructions are encoded on `3 * 4bytes` in `local_data`.
 
 
 ## Getting the code
@@ -535,7 +528,7 @@ At this point we could either attach gdb and set a breakpoint when we know
 Or read the RRTFM (read rest of fucking main) and learn that it's being
 loaded from global memory, relevant code;
 
-``` C
+```C
   puVar4 = &DAT_00102020;
   puVar5 = local_data;
   while (lVar3 != 0) {
@@ -550,7 +543,7 @@ Either way we find the code and we can start writing a quick
 dis-assembler for the operations we now about:
 
 
-``` python
+```python
 #!/usr/bin/env python3
 
 import struct
@@ -615,7 +608,9 @@ if __name__ == "__main__":
         print("%2d:  %8s  %8s %s" %  (i, op, rep_a(a), rep_b(b)))
 ```
 
-This program when run gives us a nice idea of what we are looking at:
+This program when run gives us a nice idea of what we are looking at.
+
+## Understanding the code
 
 ```
 ~/Projects/ctf/rtfm$ ./writeup.py
@@ -663,8 +658,9 @@ garbage as a password the program exits with status code 0.)
 The only way to do that is on line `30:` when `0x1` is loaded into
 `[0x3ff]` so the goal becomes to get there.
 
-To do so we need to successfully avoid all the `jnz` before that,
-re-ordering the code for clarity we get:
+To do so we need to successfully avoid all the `jnz` before that.
+
+**Re-ordering the code for clarity we get:**
 
 ```
  5:       mov   [0x100] 0x31420fa
@@ -709,13 +705,13 @@ We know that `powmod` is `a ** 0x10001 % b` so this gives us:
 ```
 
 At this point I'm starting to assume that `0x10-0x14` will contain our
-input in some form. So let's solve these equations.
+input in some form. So let's solve these equations and see what gives.
 
-Wait. I'm bad at math.
+_Wait._ I'm **bad** at math.
 
 https://www.wolframalpha.com/
 
-But it doesn't understand python.
+But it doesn't understand python. Rewrite everything to human-ish-speak.
 
 ```
 x ^ 65537 = 51650810 mod 2009560109
@@ -725,7 +721,8 @@ x ^ 65537 = 1497487137 mod 1656909407
 x ^ 65537 = 1559052731 mod 1751421943
 ```
 
-And using [wolfram](https://www.wolframalpha.com/) we get back:
+Copy pasting the above (line by line) in
+[wolfram](https://www.wolframalpha.com/) we get back:
 
 ```
 x congruent 1936287603 (mod 2009560109)
@@ -737,7 +734,7 @@ x congruent 1717969277 (mod 1751421943)
 
 Let's see what that means if that was part of a password:
 
-``` python
+```python
 >>> results = [1936287603, 1701279355, 1447900004, 1601401973, 1717969277]
 >>> print(struct.pack("iiiii", *results))
 sgis{vged3MVuts_}!ff
@@ -746,12 +743,12 @@ sgis{vged3MVuts_}!ff
 That almost looks like a flag, but it might be big endian instead of
 (default) little endian. Let's try again:
 
-``` python
+```python
 >>> print(struct.pack(">iiiii", *results))
 sigsegv{VM3d_stuff!}
 ```
 
-There we go.
+**There we go.**
 
 
 All in all this was an excellent typical reverse engineering challenge
