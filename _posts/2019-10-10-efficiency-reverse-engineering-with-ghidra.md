@@ -525,7 +525,7 @@ Much more readable already !
 At this point we could either attach gdb and set a breakpoint when we know
 `local_data` has been initialized and dump the instructions like that.
 
-Or read the RRTFM (read rest of fucking main) and learn that it's being
+Or read the RTFM (rest of fucking main) and learn that it's being
 loaded from global memory, relevant code;
 
 ```c
@@ -737,7 +737,7 @@ Let's see what that means if that was part of a password:
 ```python
 >>> results = [1936287603, 1701279355, 1447900004, 1601401973, 1717969277]
 >>> print(struct.pack("iiiii", *results))
-sgis{vged3MVuts_}!ff
+b'sgis{vged3MVuts_}!ff'
 ```
 
 That almost looks like a flag, but it might be big endian instead of
@@ -745,7 +745,7 @@ That almost looks like a flag, but it might be big endian instead of
 
 ```python
 >>> print(struct.pack(">iiiii", *results))
-sigsegv{VM3d_stuff!}
+b'sigsegv{VM3d_stuff!}'
 ```
 
 **There we go.**
