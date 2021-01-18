@@ -4,22 +4,13 @@ import React from 'react';
 
 import { createMuiTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles';
 
-import Box from '@material-ui/core/Box';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
-import Icon from '@material-ui/core/Icon';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 
-import DateRangeIcon from '@material-ui/icons/DateRange';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import MailIcon from '@material-ui/icons/Mail';
 import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
@@ -27,114 +18,99 @@ import TwitterIcon from '@material-ui/icons/Twitter';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 
-function _calculateAge(birthday) { // birthday is a date
-    // Stolen from https://stackoverflow.com/posts/21984136/revisions
-    var ageDifMs = Date.now() - birthday.getTime(); //
-    var ageDate = new Date(ageDifMs); // miliseconds from epoch
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
+import {Section, Entry, Experience, Github} from './Components.js';
+
+
+function Header() {
+    return (
+        <Section>
+
+          <div className="headerPhoto">
+            <Entry
+              title={
+                  <img
+                    alt="head shot in front of brick wall"
+                    className="headerPhoto"
+                    src="photo.jpeg"
+                    style={{maxWidth: "100%"}}
+                  />
+              }
+            />
+          </div>
+
+          <Entry
+            title={
+                <Typography variant="h3" component="h1">
+                  Wannes Rombouts
+                </Typography>
+            }
+            desc={
+                <Typography variant="h5" component="span">
+                  Python Expertise & Security<br />
+                  Full Stack Freelance
+                </Typography>
+            }
+            leftTitle={
+                  <img
+                    alt="head shot in front of brick wall"
+                    className="profilePhoto"
+                    src="photo.jpeg"
+                    style={{maxHeight: "7.2em"}}
+                  />
+            }
+          />
+
+        </Section>
+    );
 }
 
-function Entry({icon, title, leftTitle, desc, leftDesc, auto}) {
+function Contact() {
     return (
-        <Grid container item xs={12} spacing={1}>
-          <Grid container item
-                xs={leftTitle ? 12 : 2}
-                sm={2}
-                spacing={1} justify="flex-end"
-                alignItems="flex-start" align="right"
-          >
-            {leftTitle && (
-                <Grid item>
-                  {leftTitle}
-                </Grid>
-            )}
-            {icon && (
-                <Grid item>
-                  {icon}
-                </Grid>
-            )}
+        <Section>
+
+        <Grid container>
+
+          <Grid container item xs={12} sm={1}>
           </Grid>
-          <Grid container item
-                xs={leftTitle ? 12 : 10}
-                sm={10}>
-            {title && (
-                <Grid item xs={12}>
-                  {title}
-                </Grid>
-            )}
-            {desc && (
-                <Grid item xs={12}>
-                  {desc}
-                </Grid>
-            )}
+
+          <Grid container item xs={12} sm={6}>
+            <Entry inline
+              icon={<PhoneAndroidIcon fontSize="small" />}
+              title={<Link href="tel:+33645297604">(+33) 06 45 29 76 04</Link>}
+            />
+            <Entry inline
+              icon={<MailIcon fontSize="small" />}
+              title={<Link href="mailto:wapiflapi+cv@gmail.com">wapiflapi@gmail.com</Link>}
+            />
+            <Entry inline
+              icon={<AccountBalanceIcon fontSize="small" />}
+              title={<Link href="https://www.malt.fr/profile/wapiflapi">malt.fr/profile/wapiflapi</Link>}
+            />
           </Grid>
+
+          <Grid container item xs={12} sm={5}>
+            <Entry inline
+              icon={<LinkedInIcon fontSize="small" />}
+              title={<Link href="https://www.linkedin.com/in/wapiflapi/">linkedin.com/in/wapiflapi</Link>}
+            />
+            <Entry inline
+              icon={<TwitterIcon fontSize="small" />}
+              title={<Link href="https:twitter.com/wapiflapi">twitter.com/wapiflapi</Link>}
+            />
+            <Entry inline
+              icon={<GitHubIcon fontSize="small" />}
+              title={<Link href="https:github.com/wapiflapi">github.com/wapiflapi</Link>}
+            />
+          </Grid>
+
         </Grid>
-    );
-}
-
-function Experience({date, title, at, description}) {
-    return (
-        <Entry
-          title={
-              <span>
-                <strong>{title}</strong>
-                {at && <span>, {at}</span>}
-              </span>
-          }
-          leftTitle={
-              <small>{date}</small>
-          }
-          desc={
-              description
-          }
-        />
-    );
-}
-
-function Github({name, stars, users, description}) {
-    return (
-        <Entry
-          title={
-              <a href={"https://github.com/wapiflapi/" + name}>
-                github.com/wapiflapi/
-                <strong>{name}</strong>
-              </a>
-          }
-          leftTitle={stars || users}
-          icon={<Icon fontSize="small">{stars ? "star" : "people"}</Icon>}
-          desc={description}
-        />
-    );
-}
-
-
-
-function Education() {
-    return (
-        <>
-          <Experience
-            date="2015"
-            title="Master of Information Technology"
-            description="Epitech, Paris Graduate School of Digital Innovation, France"
-          />
-          <Experience
-            date="2014"
-            title="Master of Sc. in Computer Security with Distinction"
-            description="University of Kent at Canterbury, UK"
-          />
-          <Experience
-            date="2013"
-            title="Bachelor of Information Technology"
-            description="Epitech, European Institute of Information Technology"
-          />
-        </>
+        </Section>
     );
 }
 
 function Skills() {
     return (
-        <>
-
+        <Section title="Skills">
           <Experience
             date="Languages"
             title="French, English, Dutch"
@@ -143,12 +119,19 @@ function Skills() {
           />
 
           <Experience
+            date="Soft Skills"
+            title="Creative, Critical Thinking"
+            at="Scrum Master"
+            description="Open Source contributor, Workshops, Conferences, Teaching, Code Reviews"
+          />
+
+          <Experience
             date="Dev"
             title="Expertise in Python & GraphQL"
             at="REST, NodeJS, React"
             description={
                 <span>
-                  Frameworks: Django, flask, fastAPI, graphene, ariadne<br/>
+                  Toolbox: Django, flask, fastAPI, graphene, ariadne, dataloader<br/>
                   Other: redis, mongo, postgres, C/C++, PHP, go, rust, java
                 </span>
             }
@@ -158,7 +141,7 @@ function Skills() {
             date="DevOps"
             title="CI/CD"
             at="AWS, Azure, GCP"
-            description="github, gitlab, docker, kubernetes, helm, Azure"
+            description="github, gitlab, docker, kubernetes, helm"
           />
 
           <Experience
@@ -172,11 +155,7 @@ function Skills() {
             date="Security"
             title="Reverse Engineering"
             at="Exploit writing, Vulnerability Discovery, memory corruptions"
-            description={
-                <span>
-                  IDA Pro, Ghidra, GDB, fuzzers - targeting Linux Kernel, libc, web, networks
-                </span>
-            }
+            description="IDA Pro, Ghidra, GDB, fuzzers - targeting Linux Kernel, libc, web, networks"
           />
 
           <Experience
@@ -186,20 +165,13 @@ function Skills() {
             description=""
           />
 
-          <Experience
-            date="Soft Skills"
-            title="Creative, Critical Thinking"
-            at="Scrum Master"
-            description="Open Source contributor, Workshops, Conferences, Teaching, Code Reviews"
-          />
-
-        </>
+        </Section>
     );
 }
 
 function Work() {
     return (
-        <>
+        <Section title="Experience">
 
           <Experience
             date="2019 - present"
@@ -271,13 +243,37 @@ function Work() {
             description="I wrote a plugin for a monitoring platform for evaluating the quality of user experience on websites. I used Python and Selenium."
           />
 
-        </>
+        </Section>
     );
 }
 
+
+function Education() {
+    return (
+        <Section title="Education">
+          <Experience
+            date="2015"
+            title="Master of Information Technology"
+            description="Epitech, Paris Graduate School of Digital Innovation, France"
+          />
+          <Experience
+            date="2014"
+            title="Master of Sc. in Computer Security with Distinction"
+            description="University of Kent at Canterbury, UK"
+          />
+          <Experience
+            date="2013"
+            title="Bachelor of Information Technology"
+            description="Epitech, European Institute of Information Technology"
+          />
+        </Section>
+    );
+}
+
+
 function Software() {
     return (
-        <>
+        <Section title="Open Source">
           <Github
             name="admiral"
             users="10k+"
@@ -307,79 +303,14 @@ function Software() {
             forks="7"
             description="An extension framework and a collection of plugins for the GNU Project Debugger (gdb), at first a tool for my own use it became a way to explore gdb internals and provide utility to other security engineers."
           />
-        </>
-    );
-}
-
-
-function Contact() {
-    return (
-
-        <Grid container>
-
-          <Grid container item xs={12} sm={1}>
-          </Grid>
-
-          <Grid container item xs={12} sm={6}>
-
-            <Entry
-              icon={<PhoneAndroidIcon fontSize="small" />}
-              title={
-                  <Link href="tel:+33645297604">(+33) 06 45 29 76 04</Link>
-              }
-            />
-            <Entry
-              m={1}
-              icon={<MailIcon fontSize="small" />}
-              title={
-                  <Link href="mailto:wapiflapi+cv@gmail.com">wapiflapi@gmail.com</Link>
-              }
-            />
-            <Entry
-              m={1}
-              icon={<AccountBalanceIcon fontSize="small" />}
-              title={
-                  <Link href="https://www.malt.fr/profile/wapiflapi">malt.fr/profile/wapiflapi</Link>
-              }
-            />
-
-          </Grid>
-
-          <Grid container item xs={12} sm={5}>
-
-            <Entry
-              m={1}
-              icon={<LinkedInIcon fontSize="small" />}
-              title={
-                  <Link href="https://www.linkedin.com/in/wapiflapi/">linkedin.com/in/wapiflapi</Link>
-              }
-            />
-            <Entry
-              m={1}
-              icon={<TwitterIcon fontSize="small" />}
-              title={
-                  <Link href="https:twitter.com/wapiflapi">twitter.com/wapiflapi</Link>
-              }
-            />
-            <Entry
-              m={1}
-              icon={<GitHubIcon fontSize="small" />}
-              title={
-                  <Link href="https:github.com/wapiflapi">github.com/wapiflapi</Link>
-              }
-            />
-
-          </Grid>
-
-        </Grid>
-
+        </Section>
     );
 }
 
 
 function Publications() {
     return (
-        <>
+        <Section title="Publications">
 
           <Experience
             date="Dec. 2019"
@@ -494,7 +425,7 @@ function Publications() {
           />
 
 
-        </>
+        </Section>
     );
 }
 
@@ -507,38 +438,15 @@ export default function App() {
           <CssBaseline />
           <Container maxWidth="md">
 
-            <p>
-              <img className="headerPhoto" src="photo.jpeg" style={{maxWidth: "100%"}} />
-            </p>
-
-            <Typography variant="h3" component="h1">
-              Wannes Rombouts
-            </Typography>
-            <Typography variant="h5" component="p" gutterBottom>
-              Python Expertise & Security<br />
-              Full Stack Freelance
-            </Typography>
-
-            <h2>Contact</h2>
+            <Header />
             <Contact />
-            <h2>Skills</h2>
             <Skills />
-            <h2>Experience</h2>
             <Work />
 
             <div className="newpage" />
 
-            <h2>Education</h2>
             <Education />
-            <h2>Software</h2>
-            <p>
-              In addition to my contribution (issues, pull requests,
-              design discussions, ...) to several projects that I use
-              and love, I also created and maintain some projects of my
-              own.
-            </p>
             <Software />
-            <h2>Publications</h2>
             <Publications />
           </Container>
         </ThemeProvider>
