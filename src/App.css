@@ -1,0 +1,15 @@
+@media print {
+  @page {
+    size: 297mm 420mm;
+  }
+
+  .headerPhoto {
+    float: left;
+    margin-right: 2em;
+    height: 8em;
+  }
+
+  .newpage { page-break-before: always }
+  a, a:visited { color: #000 !important; text-decoration: none; }
+
+}
