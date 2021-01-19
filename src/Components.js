@@ -55,7 +55,7 @@ export function Entry({icon, title, leftTitle, desc, leftDesc, inline}) {
     );
 }
 
-export function Experience({date, title, at, description}) {
+export function Experience({date, title, at, children}) {
     return (
         <Box my={1}>
           <Entry
@@ -71,14 +71,14 @@ export function Experience({date, title, at, description}) {
                 <small>{date}</small>
             }
             desc={
-                description
+                children
             }
           />
         </Box>
     );
 }
 
-export function Github({name, stars, users, description}) {
+export function Github({name, stars, users, children}) {
     return (
         <Box my={1}>
           <Entry
@@ -89,9 +89,14 @@ export function Github({name, stars, users, description}) {
                 </a>
             }
             leftTitle={stars || users}
-            icon={<Icon fontSize="small">{stars ? "star" : "people"}</Icon>}
-            desc={description}
-          />
+            icon={
+                <Icon fontSize="small">
+                  {stars ? "star" : "people"}
+                </Icon>
+            }
+          >
+            {children}
+          </Entry>
         </Box>
     );
 }
