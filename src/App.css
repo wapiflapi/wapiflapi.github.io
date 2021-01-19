@@ -6,16 +6,21 @@
   .newpage { page-break-before: always }
   a, a:visited { color: #000 !important; text-decoration: none; }
 
-  .headerPhoto {
-    display: none !important;
+  .smallPhoto {
+    display: initial !important;
   }
 
-  .profilePhoto {
-    display: initial !important;
+  .largePhoto {
+    display: none !important;
   }
 
 }
 
-.profilePhoto {
+.smallPhoto {
   display: none;
+  max-height: 7.2em;
+}
+
+.largePhoto {
+  max-width: 100%;
 }

@@ -19,14 +19,14 @@ export function Entry({icon, title, leftTitle, desc, leftDesc, inline}) {
           >
             {leftTitle && (
                 <Grid item>
-                  <Typography>
+                  <Typography component="span">
                     {leftTitle}
                   </Typography>
                 </Grid>
             )}
             {icon && (
                 <Grid item>
-                  <Typography>
+                  <Typography component="span">
                     {icon}
                   </Typography>
                 </Grid>
@@ -38,14 +38,14 @@ export function Entry({icon, title, leftTitle, desc, leftDesc, inline}) {
           >
             {title && (
                 <Grid item xs={12}>
-                  <Typography>
+                  <Typography component="span">
                     {title}
                   </Typography>
                 </Grid>
             )}
             {desc && (
                 <Grid item xs={12}>
-                  <Typography>
+                  <Typography component="span">
                     {desc}
                   </Typography>
                 </Grid>

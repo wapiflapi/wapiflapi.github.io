@@ -21,22 +21,23 @@ import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import {Section, Entry, Experience, Github} from './Components.js';
 
 
+function Photo({...props}) {
+    return (
+        <img
+          alt="Headshot in front of brick wall"
+          src="./photo.jpeg"
+          {...props}
+        />
+    );
+}
+
 function Header() {
     return (
         <Section>
 
-          <div className="headerPhoto">
-            <Entry
-              title={
-                  <img
-                    alt="head shot in front of brick wall"
-                    className="headerPhoto"
-                    src="photo.jpeg"
-                    style={{maxWidth: "100%"}}
-                  />
-              }
-            />
-          </div>
+          <Entry
+            title={<Photo className="largePhoto" />}
+          />
 
           <Entry
             title={
@@ -51,12 +52,7 @@ function Header() {
                 </Typography>
             }
             leftTitle={
-                  <img
-                    alt="head shot in front of brick wall"
-                    className="profilePhoto"
-                    src="photo.jpeg"
-                    style={{maxHeight: "7.2em"}}
-                  />
+                <Photo className="smallPhoto" />
             }
           />
 
