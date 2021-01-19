@@ -1,6 +1,7 @@
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Icon from '@material-ui/core/Icon';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
@@ -78,15 +79,38 @@ export function Experience({date, title, at, children}) {
     );
 }
 
+export function Publication({date, title, href, at, children}) {
+    return (
+        <Box my={1}>
+          <Entry
+            title={
+                <span>
+                  <Link href={href}>
+                    <strong>{title}</strong>
+                  </Link>
+                  {at && <span>, {at}</span>}
+                </span>
+            }
+            leftTitle={
+                <small>{date}</small>
+            }
+            desc={
+                children
+            }
+          />
+        </Box>
+    );
+}
+
 export function Github({name, stars, users, children}) {
     return (
         <Box my={1}>
           <Entry
             title={
-                <a href={"https://github.com/wapiflapi/" + name}>
+                <Link href={"https://github.com/wapiflapi/" + name}>
                   github.com/wapiflapi/
                   <strong>{name}</strong>
-                </a>
+                </Link>
             }
             leftTitle={stars || users}
             icon={
@@ -94,9 +118,8 @@ export function Github({name, stars, users, children}) {
                   {stars ? "star" : "people"}
                 </Icon>
             }
-          >
-            {children}
-          </Entry>
+            desc={children}
+          />
         </Box>
     );
 }

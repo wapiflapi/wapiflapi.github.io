@@ -3,8 +3,14 @@
     size: 297mm 420mm;
   }
 
-  .newpage { page-break-before: always }
-  a, a:visited { color: #000 !important; text-decoration: none; }
+  .newpage {
+    page-break-before: always !important;
+    display: initial !important;
+  }
+
+  .printOnly {
+    display: initial !important;
+  }
 
   .smallPhoto {
     display: initial !important;
@@ -14,6 +20,14 @@
     display: none !important;
   }
 
+}
+
+.printOnly {
+  display: none;
+}
+
+.newpage {
+  display: none;
 }
 
 .smallPhoto {
